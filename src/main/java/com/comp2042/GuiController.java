@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.control.Label; // New import
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -40,6 +41,10 @@ public class GuiController implements Initializable {
     @FXML
     private GameOverPanel gameOverPanel;
 
+    // NEW: FXML field for the score label
+    @FXML
+    private Label scoreLabel;
+
     // Panels to show the next 3 upcoming bricks
     @FXML
     private GridPane nextPanel1;
@@ -62,6 +67,7 @@ public class GuiController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Assuming digital.ttf is loaded correctly
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
@@ -140,25 +146,25 @@ public class GuiController implements Initializable {
                 returnPaint = Color.TRANSPARENT;
                 break;
             case 1:
-                returnPaint = Color.AQUA;
+                returnPaint = Color.AQUA;      // I-Brick
                 break;
             case 2:
-                returnPaint = Color.BLUEVIOLET;
+                returnPaint = Color.BLUEVIOLET; // J-Brick
                 break;
             case 3:
-                returnPaint = Color.DARKGREEN;
+                returnPaint = Color.DARKGREEN;  // L-Brick
                 break;
             case 4:
-                returnPaint = Color.YELLOW;
+                returnPaint = Color.YELLOW;     // O-Brick
                 break;
             case 5:
-                returnPaint = Color.RED;
+                returnPaint = Color.RED;        // S-Brick
                 break;
             case 6:
-                returnPaint = Color.BEIGE;
+                returnPaint = Color.BEIGE;      // T-Brick
                 break;
             case 7:
-                returnPaint = Color.BURLYWOOD;
+                returnPaint = Color.BURLYWOOD;  // Z-Brick
                 break;
             default:
                 returnPaint = Color.WHITE;
@@ -205,6 +211,7 @@ public class GuiController implements Initializable {
     }
 
     public void refreshGameBackground(int[][] board) {
+        // Start drawing from row 2 (skips the 2 buffer rows)
         for (int i = 2; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 setRectangleData(board[i][j], displayMatrix[i][j]);
@@ -222,6 +229,7 @@ public class GuiController implements Initializable {
         if (isPause.getValue() == Boolean.FALSE) {
             DownData downData = eventListener.onDownEvent(event);
             if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
+                // Show bonus notification
                 NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
                 groupNotification.getChildren().add(notificationPanel);
                 notificationPanel.showScore(groupNotification.getChildren());
@@ -235,7 +243,12 @@ public class GuiController implements Initializable {
         this.eventListener = eventListener;
     }
 
+    // NEW: Binding implementation
     public void bindScore(IntegerProperty integerProperty) {
+        // Bind the text property of the score label to the IntegerProperty, auto-converting to string.
+        if (scoreLabel != null) {
+            scoreLabel.textProperty().bind(integerProperty.asString());
+        }
     }
 
     public void gameOver() {
