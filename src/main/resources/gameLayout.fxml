@@ -15,6 +15,11 @@
         </center>
     </BorderPane>
 
+    <!-- Next piece preview panels -->
+    <GridPane fx:id="nextPanel1" hgap="1" vgap="1" layoutX="240" layoutY="40"/>
+    <GridPane fx:id="nextPanel2" hgap="1" vgap="1" layoutX="240" layoutY="140"/>
+    <GridPane fx:id="nextPanel3" hgap="1" vgap="1" layoutX="240" layoutY="240"/>
+
     <Group fx:id="groupNotification" layoutX="14" layoutY="203">
         <VBox alignment="CENTER">
             <GameOverPanel fx:id="gameOverPanel"/>

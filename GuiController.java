@@ -26,7 +26,6 @@ import java.util.ResourceBundle;
 public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
-    private static final int PREVIEW_BRICK_SIZE = 14;
 
     @FXML
     private GridPane gamePanel;
@@ -39,14 +38,6 @@ public class GuiController implements Initializable {
 
     @FXML
     private GameOverPanel gameOverPanel;
-
-    // Panels to show the next 3 upcoming bricks
-    @FXML
-    private GridPane nextPanel1;
-    @FXML
-    private GridPane nextPanel2;
-    @FXML
-    private GridPane nextPanel3;
 
     private Rectangle[][] displayMatrix;
 
@@ -122,8 +113,6 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
 
-        // Draw initial next-piece previews
-        updatePreviews(brick);
 
         timeLine = new Timeline(new KeyFrame(
                 Duration.millis(400),
@@ -176,30 +165,6 @@ public class GuiController implements Initializable {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
                 }
-            }
-            updatePreviews(brick);
-        }
-    }
-
-    private void updatePreviews(ViewData brick) {
-        drawPreview(nextPanel1, brick.getNextBrickData1());
-        drawPreview(nextPanel2, brick.getNextBrickData2());
-        drawPreview(nextPanel3, brick.getNextBrickData3());
-    }
-
-    private void drawPreview(GridPane panel, int[][] data) {
-        if (panel == null || data == null) return;
-        panel.getChildren().clear();
-        // Center the preview roughly within a 4x4 grid area
-        int rows = data.length;
-        int cols = rows > 0 ? data[0].length : 0;
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Rectangle r = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
-                r.setFill(getFillColor(data[i][j]));
-                r.setArcHeight(6);
-                r.setArcWidth(6);
-                panel.add(r, j, i);
             }
         }
     }
