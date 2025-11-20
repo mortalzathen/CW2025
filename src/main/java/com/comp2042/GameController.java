@@ -2,6 +2,7 @@ package com.comp2042;
 
 public class GameController implements InputEventListener {
 
+    // Board size: 25 rows high (2 hidden), 10 columns wide
     private Board board = new SimpleBoard(25, 10);
 
     private final GuiController viewGuiController;
@@ -30,10 +31,6 @@ public class GameController implements InputEventListener {
 
             viewGuiController.refreshGameBackground(board.getBoardMatrix());
 
-        } else {
-            if (event.getEventSource() == EventSource.USER) {
-                board.getScore().add(1);
-            }
         }
         return new DownData(clearRow, board.getViewData());
     }
