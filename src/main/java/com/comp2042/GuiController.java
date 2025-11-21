@@ -106,7 +106,6 @@ public class GuiController implements Initializable {
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
-        gamePanel.setGridLinesVisible(true);
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
         for (int i = 2; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
@@ -128,8 +127,6 @@ public class GuiController implements Initializable {
         }
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
-
-        // Draw initial next-piece previews
         updatePreviews(brick);
 
         timeLine = new Timeline(new KeyFrame(
@@ -177,8 +174,8 @@ public class GuiController implements Initializable {
 
     private void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE - 0.85);
-            brickPanel.setLayoutY(-48 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+            brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
+            brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
@@ -197,7 +194,6 @@ public class GuiController implements Initializable {
     private void drawPreview(GridPane panel, int[][] data) {
         if (panel == null || data == null) return;
         panel.getChildren().clear();
-        // Center the preview roughly within a 4x4 grid area
         int rows = data.length;
         int cols = rows > 0 ? data[0].length : 0;
         for (int i = 0; i < rows; i++) {
@@ -243,7 +239,8 @@ public class GuiController implements Initializable {
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
-    
+
+    // NEW: Binding implementation
     public void bindScore(IntegerProperty integerProperty) {
         // Bind the text property of the score label to the IntegerProperty, auto-converting to string.
         if (scoreLabel != null) {

@@ -8,9 +8,10 @@
 <?import java.net.URL?>
 <Pane fx:controller="com.comp2042.GuiController"
       xmlns:fx="http://javafx.com/fxml">
+
     <BorderPane styleClass="gameBoard" fx:id="gameBoard">
         <center>
-            <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="30" layoutX="40"/>
+            <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="30" layoutX="40" styleClass="gamePanel"/>
         </center>
     </BorderPane>
 
