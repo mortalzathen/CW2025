@@ -4,7 +4,10 @@ import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickGenerator;
 import com.comp2042.logic.bricks.RandomBrickGenerator;
 
-import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
+import java.util.List;
+import java.awt.Point;
 
 public class SimpleBoard implements Board {
 
@@ -13,7 +16,8 @@ public class SimpleBoard implements Board {
     private final BrickGenerator brickGenerator;
     private final BrickRotator brickRotator;
     private int[][] currentGameMatrix;
-    private Point currentOffset;
+
+    private Point2D currentOffset;
     private final Score score;
 
     public SimpleBoard(int width, int height) {
@@ -25,12 +29,25 @@ public class SimpleBoard implements Board {
         score = new Score();
     }
 
+    public int getGhostYPosition() {
+        int ghostY = (int) currentOffset.getY();
+
+        while (!MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), ghostY + 1)) {
+            ghostY++;
+        }
+        return ghostY;
+    }
+
     @Override
     public boolean moveBrickDown() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
-        Point p = new Point(currentOffset);
-        p.translate(0, 1);
+
+        Point2D.Double p = new Point2D.Double(currentOffset.getX(), currentOffset.getY());
+
+        p.setLocation(p.getX() + 0, p.getY() + 1.0);
+
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
+
         if (conflict) {
             return false;
         } else {
@@ -43,8 +60,10 @@ public class SimpleBoard implements Board {
     @Override
     public boolean moveBrickLeft() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
-        Point p = new Point(currentOffset);
-        p.translate(-1, 0);
+        Point2D.Double p = new Point2D.Double(currentOffset.getX(), currentOffset.getY());
+
+        p.setLocation(p.getX() - 1, p.getY() + 0);
+
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
         if (conflict) {
             return false;
@@ -57,8 +76,10 @@ public class SimpleBoard implements Board {
     @Override
     public boolean moveBrickRight() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
-        Point p = new Point(currentOffset);
-        p.translate(1, 0);
+        Point2D.Double p = new Point2D.Double(currentOffset.getX(), currentOffset.getY());
+
+        p.setLocation(p.getX() + 1, p.getY() + 0);
+
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
         if (conflict) {
             return false;
@@ -72,7 +93,9 @@ public class SimpleBoard implements Board {
     public boolean rotateLeftBrick() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         NextShapeInfo nextShape = brickRotator.getNextShape();
+
         boolean conflict = MatrixOperations.intersect(currentMatrix, nextShape.getShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
+
         if (conflict) {
             return false;
         } else {
@@ -85,7 +108,9 @@ public class SimpleBoard implements Board {
     public boolean createNewBrick() {
         Brick currentBrick = brickGenerator.getBrick();
         brickRotator.setBrick(currentBrick);
-        currentOffset = new Point(4, 1);
+
+        currentOffset = new Point2D.Double(4.0, 0.0);
+
         return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
     }
 
@@ -100,18 +125,18 @@ public class SimpleBoard implements Board {
         int[][] n2;
         int[][] n3;
         if (brickGenerator instanceof com.comp2042.logic.bricks.RandomBrickGenerator rbg) {
-            java.util.List<com.comp2042.logic.bricks.Brick> list = rbg.getNextBricks(3);
+            List<com.comp2042.logic.bricks.Brick> list = rbg.getNextBricks(3);
             n1 = list.size() > 0 ? list.get(0).getShapeMatrix().get(0) : new int[0][0];
             n2 = list.size() > 1 ? list.get(1).getShapeMatrix().get(0) : new int[0][0];
             n3 = list.size() > 2 ? list.get(2).getShapeMatrix().get(0) : new int[0][0];
         } else {
-            // Fallback: repeat the single next brick if multiple previews not available
             int[][] single = brickGenerator.getNextBrick().getShapeMatrix().get(0);
             n1 = single;
             n2 = single;
             n3 = single;
         }
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), n1, n2, n3);
+
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), n1, n2, n3, getGhostYPosition());
     }
 
     @Override
@@ -124,7 +149,6 @@ public class SimpleBoard implements Board {
         ClearRow clearRow = MatrixOperations.checkRemoving(currentGameMatrix);
         currentGameMatrix = clearRow.getNewMatrix();
         return clearRow;
-
     }
 
     @Override

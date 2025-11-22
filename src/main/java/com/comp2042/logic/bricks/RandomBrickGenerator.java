@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomBrickGenerator implements BrickGenerator {
 
-    private static final int INITIAL_QUEUE_SIZE = 4; // generate next 4 bricks initially
+    private static final int INITIAL_QUEUE_SIZE = 4;
 
     private final List<Brick> brickList;
 
@@ -23,7 +23,6 @@ public class RandomBrickGenerator implements BrickGenerator {
         brickList.add(new SBrick());
         brickList.add(new TBrick());
         brickList.add(new ZBrick());
-        // Fill the next queue with 4 upcoming bricks at start
         while (nextBricks.size() < INITIAL_QUEUE_SIZE) {
             nextBricks.add(randomBrick());
         }
@@ -31,20 +30,16 @@ public class RandomBrickGenerator implements BrickGenerator {
 
     @Override
     public Brick getBrick() {
-        // Take the next brick from the queue
         Brick next = nextBricks.poll();
-        // Immediately generate one new brick and append it to the queue
         nextBricks.add(randomBrick());
         return next;
     }
 
     @Override
     public Brick getNextBrick() {
-        // The first upcoming brick
         return nextBricks.peek();
     }
 
-    // Optional convenience for UIs that want to show multiple next pieces (not part of interface)
     public List<Brick> getNextBricks(int count) {
         List<Brick> list = new ArrayList<>();
         int i = 0;
