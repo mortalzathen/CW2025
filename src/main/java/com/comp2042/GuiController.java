@@ -10,7 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
-import javafx.scene.control.Label; // New import
+import javafx.scene.control.Label;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -23,6 +23,7 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Arrays; // Required for the temporary bottomIndices logic
 
 public class GuiController implements Initializable {
 
@@ -41,11 +42,9 @@ public class GuiController implements Initializable {
     @FXML
     private GameOverPanel gameOverPanel;
 
-    // NEW: FXML field for the score label
     @FXML
     private Label scoreLabel;
 
-    // Panels to show the next 3 upcoming bricks
     @FXML
     private GridPane nextPanel1;
     @FXML
@@ -53,6 +52,10 @@ public class GuiController implements Initializable {
     @FXML
     private GridPane nextPanel3;
 
+    @FXML
+    private GridPane ghostPanel; // The dedicated pane
+
+    private Rectangle[][] ghostRectangles;
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -67,7 +70,6 @@ public class GuiController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Assuming digital.ttf is loaded correctly
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
@@ -95,6 +97,13 @@ public class GuiController implements Initializable {
                 if (keyEvent.getCode() == KeyCode.N) {
                     newGame(null);
                 }
+                if (keyEvent.getCode() == KeyCode.BACK_SPACE) {
+                    if (isPause.get() == Boolean.FALSE) {
+                        pauseGame(null);
+                    } else {
+                        pauseGame(null);
+                    }
+                }
             }
         });
         gameOverPanel.setVisible(false);
@@ -121,12 +130,32 @@ public class GuiController implements Initializable {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
                 rectangle.setFill(getFillColor(brick.getBrickData()[i][j]));
+                rectangle.setFill(getFillColor(brick.getBrickData()[i][j]));
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
         }
+
+        // Initialize the dedicated ghost rectangles array
+        ghostRectangles = new Rectangle[4][4];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                Rectangle r = new Rectangle(BRICK_SIZE, BRICK_SIZE);
+                r.setFill(Color.TRANSPARENT);
+                r.setArcHeight(9);
+                r.setArcWidth(9);
+                ghostRectangles[i][j] = r;
+                ghostPanel.add(r, j, i);
+            }
+        }
+
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+
+        // GHOST PANEL: Set the base position to the EXACT same offset as brickPanel
+        ghostPanel.setLayoutX(brickPanel.getLayoutX());
+        ghostPanel.setLayoutY(brickPanel.getLayoutY());
+
         updatePreviews(brick);
 
         timeLine = new Timeline(new KeyFrame(
@@ -144,25 +173,25 @@ public class GuiController implements Initializable {
                 returnPaint = Color.TRANSPARENT;
                 break;
             case 1:
-                returnPaint = Color.AQUA;      // I-Brick
+                returnPaint = Color.AQUA;
                 break;
             case 2:
-                returnPaint = Color.BLUEVIOLET; // J-Brick
+                returnPaint = Color.BLUEVIOLET;
                 break;
             case 3:
-                returnPaint = Color.DARKGREEN;  // L-Brick
+                returnPaint = Color.DARKGREEN;
                 break;
             case 4:
-                returnPaint = Color.YELLOW;     // O-Brick
+                returnPaint = Color.YELLOW;
                 break;
             case 5:
-                returnPaint = Color.RED;        // S-Brick
+                returnPaint = Color.RED;
                 break;
             case 6:
-                returnPaint = Color.BEIGE;      // T-Brick
+                returnPaint = Color.BEIGE;
                 break;
             case 7:
-                returnPaint = Color.BURLYWOOD;  // Z-Brick
+                returnPaint = Color.BURLYWOOD;
                 break;
             default:
                 returnPaint = Color.WHITE;
@@ -171,16 +200,70 @@ public class GuiController implements Initializable {
         return returnPaint;
     }
 
+    // UPDATED: Method to return a solid Gray color for the ghost
+    private Paint getGhostColor(int i) {
+        // Return a solid light gray color
+        return Color.LIGHTGRAY;
+    }
+
 
     private void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-            brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
-            for (int i = 0; i < brick.getBrickData().length; i++) {
-                for (int j = 0; j < brick.getBrickData()[i].length; j++) {
-                    setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
+
+            // --- GHOST LOGIC PRE-CALCULATION START ---
+            int[] bottomIndices = new int[4];
+            for (int k = 0; k < 4; k++) bottomIndices[k] = -1;
+
+            for (int j = 0; j < 4; j++) {
+                for (int i = 3; i >= 0; i--) {
+                    if (brick.getBrickData()[i][j] != 0) {
+                        bottomIndices[j] = i;
+                        break;
+                    }
                 }
             }
+            int ghostY = brick.getGhostYPosition();
+            int deltaY = ghostY - brick.getyPosition();
+            double vgap = brickPanel.getVgap();
+            double yTranslateDistance = deltaY * (BRICK_SIZE + vgap);
+
+            double calculatedX = gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE;
+            double calculatedY = -42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE;
+
+            brickPanel.setLayoutX(calculatedX);
+            brickPanel.setLayoutY(calculatedY);
+
+            ghostPanel.setLayoutX(calculatedX);
+            ghostPanel.setLayoutY(calculatedY);
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    Rectangle r = ghostRectangles[i][j];
+                    int colorIndex = brick.getBrickData()[i][j];
+
+                    r.setTranslateY(0);
+                    r.setStroke(null);
+                    r.setStrokeWidth(0);
+                    r.setFill(Color.TRANSPARENT);
+
+                    if (colorIndex != 0) {
+                        r.setTranslateY(yTranslateDistance);
+                        r.setStroke(Color.DARKGRAY);
+                        r.setStrokeWidth(1.0);
+                        r.setFill(Color.LIGHTGRAY);
+                    }
+                }
+            }
+
+            for (int i = 0; i < brick.getBrickData().length; i++) {
+                for (int j = 0; j < brick.getBrickData()[i].length; j++) {
+                    Rectangle r = rectangles[i][j];
+                    r.setStroke(null);
+                    r.setStrokeWidth(0);
+                    setRectangleData(brick.getBrickData()[i][j], r);
+                }
+            }
+
             updatePreviews(brick);
         }
     }
@@ -208,7 +291,6 @@ public class GuiController implements Initializable {
     }
 
     public void refreshGameBackground(int[][] board) {
-        // Start drawing from row 2 (skips the 2 buffer rows)
         for (int i = 2; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 setRectangleData(board[i][j], displayMatrix[i][j]);
@@ -220,29 +302,26 @@ public class GuiController implements Initializable {
         rectangle.setFill(getFillColor(color));
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
+        rectangle.setFill(getFillColor(color));
     }
 
     private void moveDown(MoveEvent event) {
         if (isPause.getValue() == Boolean.FALSE) {
             DownData downData = eventListener.onDownEvent(event);
             if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
-                // Show bonus notification
                 NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
                 groupNotification.getChildren().add(notificationPanel);
                 notificationPanel.showScore(groupNotification.getChildren());
             }
             refreshBrick(downData.getViewData());
         }
-        gamePanel.requestFocus();
     }
 
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
 
-    // NEW: Binding implementation
     public void bindScore(IntegerProperty integerProperty) {
-        // Bind the text property of the score label to the IntegerProperty, auto-converting to string.
         if (scoreLabel != null) {
             scoreLabel.textProperty().bind(integerProperty.asString());
         }
@@ -265,6 +344,13 @@ public class GuiController implements Initializable {
     }
 
     public void pauseGame(ActionEvent actionEvent) {
-        gamePanel.requestFocus();
+        if(isPause.getValue() == Boolean.FALSE) {
+            timeLine.stop();
+            isPause.setValue(Boolean.TRUE);
+        }
+        else {
+            timeLine.play();
+            isPause.setValue(Boolean.FALSE);
+        }
     }
 }
