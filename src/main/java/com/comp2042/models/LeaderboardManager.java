@@ -34,6 +34,9 @@ public class LeaderboardManager {
      * @param score The final score achieved.
      */
     public static void addScore(String playerName, int score) {
+        if (playerName == null || playerName.trim().isEmpty()) {
+            playerName = "Player";
+        }
         scores.add(new ScoreEntry(playerName, score));
         sortAndTrim();
         saveScoresToFile();
