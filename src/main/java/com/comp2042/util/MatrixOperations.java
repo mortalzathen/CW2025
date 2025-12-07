@@ -9,6 +9,10 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Provides static utility methods for manipulating 2D integer matrices, primarily used
+ * for collision detection, merging bricks into the background, and clearing rows.
+ */
 public class MatrixOperations {
 
 
@@ -16,6 +20,16 @@ public class MatrixOperations {
 
     }
 
+    /**
+     * Checks if the given brick shape intersects with any boundary or existing blocks
+     * in the game matrix at the specified (x, y) offset.
+     *
+     * @param matrix The current background game matrix.
+     * @param brick The shape matrix of the falling brick.
+     * @param x The top-left X position offset.
+     * @param y The top-left Y position offset.
+     * @return True if a collision is detected, false otherwise.
+     */
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
         for (int i = 0; i < brick.length; i++) {
             for (int j = 0; j < brick[i].length; j++) {
@@ -37,6 +51,7 @@ public class MatrixOperations {
         return returnValue;
     }
 
+    /** Performs a deep copy of a 2D integer array. */
     public static int[][] copy(int[][] original) {
         int[][] myInt = new int[original.length][];
         for (int i = 0; i < original.length; i++) {

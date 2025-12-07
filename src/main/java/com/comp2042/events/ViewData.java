@@ -13,6 +13,10 @@ public final class ViewData {
 
     private final int ghostYPosition;
 
+    /**
+     * Immutable data transfer object (DTO) containing all information required by the GUI
+     * to render the game screen for a single frame, including piece position, shape, and previews.
+     */
     public ViewData(int[][] brickData, int xPosition, int yPosition, int[][] nextBrickData1, int[][] nextBrickData2, int[][] nextBrickData3, int ghostYPosition) {
         this.brickData = brickData;
         this.xPosition = xPosition;
@@ -23,14 +27,23 @@ public final class ViewData {
         this.ghostYPosition = ghostYPosition;
     }
 
+    /**
+     * @return A copy of the current falling brick's data matrix.
+     */
     public int[][] getBrickData() {
         return MatrixOperations.copy(brickData);
     }
 
+    /**
+     * @return The column index (X) of the falling brick's top-left corner.
+     */
     public int getxPosition() {
         return xPosition;
     }
 
+    /**
+     * @return The row index (Y) of the falling brick's top-left corner.
+     */
     public int getyPosition() {
         return yPosition;
     }

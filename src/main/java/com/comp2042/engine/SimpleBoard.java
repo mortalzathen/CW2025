@@ -14,6 +14,10 @@ import com.comp2042.Constants;
 import java.awt.geom.Point2D;
 import java.util.List;
 
+/**
+ * Concrete implementation of the Board interface. Manages the 2D array representing the game
+ * state, tracks the current falling piece, handles movement validation, and score calculation.
+ */
 public class SimpleBoard implements Board {
 
     private final int width;
@@ -25,6 +29,11 @@ public class SimpleBoard implements Board {
     private Point2D currentOffset;
     private final Score score;
 
+    /**
+     * Constructs a new SimpleBoard with specified dimensions.
+     * @param width The width of the board matrix.
+     * @param height The height of the board matrix.
+     */
     public SimpleBoard(int width, int height) {
         this.width = width;
         this.height = height;
@@ -34,6 +43,7 @@ public class SimpleBoard implements Board {
         score = new Score();
     }
 
+    /** Calculates the lowest valid Y position where the current brick would land. */
     public int getGhostYPosition() {
         int ghostY = (int) currentOffset.getY();
 

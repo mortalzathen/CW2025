@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Manages the high score list, handling persistence (saving/loading to file),
+ * score submission, sorting, and trimming the list size.
+ */
 public class LeaderboardManager {
 
     private static final String FILE_PATH = "leaderboard.dat";
@@ -16,6 +20,12 @@ public class LeaderboardManager {
         loadScoresFromFile();
     }
 
+    /**
+     * Submits a new score entry, sorts the list, trims it to MAX_ENTRIES, and saves the file.
+     *
+     * @param playerName The name of the player.
+     * @param score The final score achieved.
+     */
     public static void addScore(String playerName, int score) {
         scores.add(new ScoreEntry(playerName, score));
         sortAndTrim();
@@ -30,6 +40,11 @@ public class LeaderboardManager {
     }
 
 
+    /**
+     * Retrieves the top scores from the list.
+     *
+     * @return A new list containing the top scores, sorted high to low.
+     */
     public static List<ScoreEntry> getTopScores() {
         return new ArrayList<>(scores);
     }

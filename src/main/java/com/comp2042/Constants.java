@@ -1,5 +1,9 @@
 package com.comp2042;
 
+/**
+ * Global constants used throughout the application to define game rules, UI dimensions,
+ * timing, and brick identifiers. This prevents the use of "magic numbers" in the core logic.
+ */
 public class Constants {
         private Constants() {}
 
