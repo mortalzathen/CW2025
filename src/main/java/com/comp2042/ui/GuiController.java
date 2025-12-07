@@ -388,12 +388,12 @@ public class GuiController implements Initializable {
     public void pauseGame(ActionEvent actionEvent) {
         if(isPause.getValue() == Boolean.FALSE) {
             timeLine.stop();
-            pauseButton.setText("Pause");
+            pauseButton.setText("Resume");
             isPause.setValue(Boolean.TRUE);
         }
         else {
             timeLine.play();
-            pauseButton.setText("Resume");
+            pauseButton.setText("Pause");
             isPause.setValue(Boolean.FALSE);
         }
     }
