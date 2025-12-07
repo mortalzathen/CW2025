@@ -1,1 +1,21 @@
-[{"playerName":"Player","score":0}]
+[  {
+  "playerName": "ZENITH",
+  "score": 18500
+},
+  {
+    "playerName": "ATHUL",
+    "score": 12450
+  },
+  {
+    "playerName": "GUEST",
+    "score": 9320
+  },
+  {
+    "playerName": "PLAYER-X",
+    "score": 5100
+  },
+  {
+    "playerName": "SLOW_BUT_SURE",
+    "score": 850
+  }
+]
