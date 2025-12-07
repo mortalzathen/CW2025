@@ -13,10 +13,23 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * Controller class for the main application menu (menuLayout.fxml).
+ * Handles starting the game, showing the leaderboard, and exiting the application.
+ */
+
 public class MenuController {
     @FXML
     private TextField nameField;
     public static String playerName;
+
+    /**
+     * Handles the action when the START GAME button is pressed.
+     * Validates the player name, stores it statically, and switches the scene to the game board.
+     *
+     * @param event The ActionEvent triggered by the button click.
+     * @throws Exception if the gameLayout.fxml cannot be loaded.
+     */
     public void startGame(ActionEvent event) throws Exception {
         playerName = nameField.getText().trim();
         if (playerName.isEmpty()) {
@@ -37,6 +50,12 @@ public class MenuController {
         new GameController(c);
     }
 
+    /**
+     * Handles the action when the LEADERBOARD button is pressed.
+     * Loads the leaderboardLayout.fxml scene and displays the top scores.
+     *
+     * @param event The ActionEvent triggered by the button click.
+     */
     public void showLeaderboard(ActionEvent event) throws Exception {
         try {
             Stage primaryStage = (Stage) ((Parent) event.getSource()).getScene().getWindow();
@@ -63,7 +82,14 @@ public class MenuController {
         }
     }
 
+    /**
+     * Handles the action when the EXIT button is pressed.
+     * Terminates the JavaFX application.
+     *
+     * @param event The ActionEvent triggered by the button click.
+     */
     public void exitGame(ActionEvent event) {
         Platform.exit();
     }
+
 }

@@ -12,6 +12,11 @@ import com.comp2042.ui.NotificationPanel;
 import com.comp2042.Constants;
 import javafx.beans.property.IntegerProperty;
 
+/**
+ * The main controller for the Tetris game logic. Implements the InputEventListener
+ * interface to handle all user input and timed events (down movements).
+ * This class manages the board state, score submission, and synchronizes with the GUI.
+ */
 public class GameController implements InputEventListener {
 
     private Board board = new SimpleBoard(Constants.BOARD_HEIGHT, Constants.BOARD_WIDTH);
@@ -20,6 +25,12 @@ public class GameController implements InputEventListener {
     private String playerName;
     private IntegerProperty scoreProperty;
 
+    /**
+     * Initializes the GameController, setting up the board, retrieving the player name,
+     * and binding the score property to the GUI.
+     *
+     * @param c The GuiController instance responsible for rendering the game.
+     */
     public GameController(GuiController c) {
         viewGuiController = c;
         viewGuiController.setEventListener(this);
@@ -33,6 +44,13 @@ public class GameController implements InputEventListener {
         viewGuiController.bindScore(this.scoreProperty);
     }
 
+    /**
+     * Handles the soft drop or timed movement event. Merges the brick if collision occurs,
+     * clears rows, and checks for game over.
+     *
+     * @param event Details about the move event (Source, Type).
+     * @return DownData containing any cleared row information and the current ViewData.
+     */
     @Override
     public DownData onDownEvent(MoveEvent event) {
         boolean canMove = board.moveBrickDown();
@@ -58,24 +76,46 @@ public class GameController implements InputEventListener {
         return new DownData(clearRow, board.getViewData());
     }
 
+    /**
+     * Handles the left movement event.
+     *
+     * @param event Details about the move event.
+     * @return ViewData showing the new position of the brick.
+     */
     @Override
     public ViewData onLeftEvent(MoveEvent event) {
         board.moveBrickLeft();
         return board.getViewData();
     }
 
+    /**
+     * Handles the right movement event.
+     *
+     * @param event Details about the move event.
+     * @return ViewData showing the new position of the brick.
+     */
     @Override
     public ViewData onRightEvent(MoveEvent event) {
         board.moveBrickRight();
         return board.getViewData();
     }
 
+    /**
+     * Handles the rotate movement event.
+     *
+     * @param event Details about the move event.
+     * @return ViewData showing the new position of the brick.
+     */
     @Override
     public ViewData onRotateEvent(MoveEvent event) {
         board.rotateLeftBrick();
         return board.getViewData();
     }
 
+    /**
+     * Handles the hard drop event (SPACE key). Drops the piece instantly, merges it,
+     * submits the score, and checks for game over.
+     */
     public ViewData onHardDropEvent(MoveEvent event) {
 
         board.hardDropBrick();
@@ -98,6 +138,9 @@ public class GameController implements InputEventListener {
         return board.getViewData();
     }
 
+    /**
+     * Submits the final score and player name to the LeaderboardManager and triggers the GUI game over screen.
+     */
     private void submitScoreAndGameOver() {
 
         int finalScore = this.scoreProperty.get();
@@ -107,6 +150,9 @@ public class GameController implements InputEventListener {
         viewGuiController.gameOver();
     }
 
+    /**
+     * Resets the game board and initializes a new game instance.
+     */
     @Override
     public void createNewGame() {
         board.newGame();
