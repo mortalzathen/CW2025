@@ -16,6 +16,19 @@ This project uses the **Maven Wrapper** (`mvnw` or `mvnw.cmd`) to ensure a consi
 2.  **JAVA\_HOME Environment Variable:** Must be set and pointing to your JDK installation path (e.g., `C:\Program Files\Java\jdk-23`).
 
 ### Execution Steps
+
+#### 🛠️ Windows (CMD/Powershell only)
+
+If you are using a CMD/Powershell on Windows, you **must run these two commands first** in your current session to correctly set the path variables using shell syntax:
+
+```bash
+# 1. Set the JAVA_HOME variable using the Bash path format (forward slashes)
+$env:JAVA_HOME="C:\Program Files\Java\jdk-23"
+
+# 2. Add the JDK's bin directory to the system PATH variable
+$env:Path="$env:JAVA_HOME\bin;$env:Path"
+```
+
 #### 🛠️ Windows (Bash Terminals only: Git Bash / MINGW64)
 
 If you are using a Bash terminal on Windows, you **must run these two commands first** in your current session to correctly set the path variables using Bash syntax:
